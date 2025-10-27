@@ -243,44 +243,49 @@ document.getElementById('notification-btn').addEventListener('click', async () =
 });
 
 // 샘플 알림 발송 함수
-function sendSampleNotifications() {
+async function sendSampleNotifications() {
   const statusEl = document.getElementById('notification-status');
 
   try {
-    console.log('Sending first notification...');
+    console.log('Sending notification via Service Worker...');
 
-    // 첫 번째 알림
-    const notification1 = new Notification('🚀 PWA 샘플 앱', {
+    // Service Worker registration 가져오기
+    const registration = await navigator.serviceWorker.ready;
+
+    // 첫 번째 알림 (Service Worker 통해 발송)
+    await registration.showNotification('🚀 PWA 샘플 앱', {
       body: '알림이 정상적으로 작동합니다!',
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/icon-192x192.png',
       tag: 'pwa-sample-1',
-      requireInteraction: false
+      requireInteraction: false,
+      vibrate: [200, 100, 200], // 진동 패턴 (Android)
+      data: {
+        url: window.location.origin
+      }
     });
 
-    notification1.onclick = function() {
-      console.log('Notification clicked');
-      window.focus();
-      this.close();
-    };
-
+    console.log('First notification sent');
     statusEl.textContent = '첫 번째 알림 발송 완료! 3초 후 추가 알림이 발송됩니다.';
     statusEl.style.color = '#10b981';
 
     // 3초 후 두 번째 알림
-    setTimeout(() => {
+    setTimeout(async () => {
       console.log('Sending second notification...');
 
-      const notification2 = new Notification('💡 추가 샘플 알림', {
+      await registration.showNotification('💡 추가 샘플 알림', {
         body: 'PWA는 백그라운드 알림도 지원합니다!',
+        icon: '/icons/icon-512x512.png',
+        badge: '/icons/icon-192x192.png',
         tag: 'pwa-sample-2',
-        requireInteraction: false
+        requireInteraction: false,
+        vibrate: [100, 50, 100],
+        data: {
+          url: window.location.origin
+        }
       });
 
-      notification2.onclick = function() {
-        console.log('Second notification clicked');
-        window.focus();
-        this.close();
-      };
-
+      console.log('Second notification sent');
       statusEl.textContent = '두 번째 알림 발송 완료! ✅';
     }, 3000);
 
